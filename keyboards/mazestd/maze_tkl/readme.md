@@ -13,7 +13,7 @@ Universal TKL PCB for TGR Jane V2 Board and Standard TKL Board
 Enter the bootloader in 3 ways:
 
 * **Bootmagic reset**: Hold down the Esc key and plug in the keyboard
-* **Physical reset pins**: Briefly short the reset pins on the bottom of board
+* **Physical reset button**: Push the reset button on the bottom of board
 
 
 #### Flashing
