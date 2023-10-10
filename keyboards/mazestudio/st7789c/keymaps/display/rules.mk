@@ -1,0 +1,7 @@
+QUANTUM_PAINTER_ENABLE = yes
+# QUANTUM_PAINTER_LVGL_INTEGRATION = yes
+QUANTUM_PAINTER_DRIVERS = st7789_spi
+
+#Additional Configuration to fix compiler issue
+OPT_DEFS = -O2
+EXTRALDFLAGS = -Wl,--defsym,FLASH_LEN=8192k

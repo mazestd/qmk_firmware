@@ -1,0 +1,2 @@
+#define WS2812_DI_PIN GP8
+#define RGBLED_NUM 41

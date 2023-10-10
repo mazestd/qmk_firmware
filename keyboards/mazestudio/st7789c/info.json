@@ -1,0 +1,58 @@
+{
+    "manufacturer": "Reza Alif Dio",
+    "keyboard_name": "1ok",
+    "maintainer": "Alabahuy",
+    "bootloader": "rp2040",
+    "debounce": 5,
+    "diode_direction": "COL2ROW",
+    "features": {
+        "bootmagic": true,
+        "command": false,
+        "console": true,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true,
+        "rgblight": true
+    },
+    "matrix_pins": {
+        "cols": ["GP24"],
+        "rows": ["GP23"]
+    },
+    "processor": "RP2040",
+    "url": "",
+    "usb": {
+        "device_version": "1.0.0",
+        "pid": "0x0023",
+        "vid": "0x414C"
+    },
+    "rgblight": {
+        "led_count": 2,
+        "hue_steps": 8,
+        "saturation_steps": 8,
+        "brightness_steps": 8,
+        "max_brightness": 255,
+    "animations": {
+        "alternating": true,
+        "breathing": true,
+        "christmas": true,
+        "knight": true,
+        "rainbow_mood": true,
+        "rainbow_swirl": true,
+        "rgb_test": true,
+        "snake": true,
+        "static_gradient": true,
+        "twinkle": true
+        }
+    },
+    "ws2812": {
+        "pin": "GP18",
+        "driver": "vendor"
+    },
+    "layouts": {
+        "LAYOUT_ortho_1x1": {
+            "layout": [
+                {"matrix": [0, 0], "x": 0, "y": 0 }
+            ]
+        }
+    }
+}

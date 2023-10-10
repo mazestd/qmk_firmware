@@ -289,17 +289,9 @@ void layer_sync(uint8_t initiator2target_buffer_size, const void *initiator2targ
     }
 }
 
-void caps_word_sync(uint8_t initiator2target_buffer_size, const void *initiator2target_buffer, uint8_t target2initiator_buffer_size, void *target2initiator_buffer) {
-    if (is_display_enabled()) {
-        display_process_caps_word(*(bool *)initiator2target_buffer);
-    }
-}
-
 void keyboard_post_init_user() {
     // sync received hid data
     transaction_register_rpc(RPC_ID_USER_HID_SYNC, hid_sync);
     // sync highest layer (a bit more performant than standard SPLIT_LAYER_STATE_ENABLE)
     transaction_register_rpc(RPC_ID_USER_LAYER_SYNC, layer_sync);
-    // sync caps word state
-    transaction_register_rpc(RPC_ID_USER_CAPS_WORD_SYNC, caps_word_sync);
 }

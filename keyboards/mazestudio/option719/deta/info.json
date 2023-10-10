@@ -1,0 +1,37 @@
+{
+    "manufacturer": "Maze Studio",
+    "keyboard_name": "Option719",
+    "maintainer": "Maze Studio",
+    "bootloader": "rp2040",
+    "features": {
+        "bootmagic": true,
+        "command": true,
+        "backlight": true,
+        "console": true,
+        "extrakey": true,
+        "mousekey": true,
+        "nkro": true
+    },
+    "matrix_pins": {
+        "cols": ["GP24"],
+        "rows": ["GP23"]
+    },
+    "backlight": {
+        "pin": "GP2"
+    },
+    "diode_direction": "COL2ROW",
+    "processor": "RP2040",
+    "url": "",
+    "usb": {
+        "vid": "0x70F5",
+        "pid": "0x0840",
+        "device_version": "0.0.5"
+    },
+    "layouts": {
+        "LAYOUT": {
+            "layout": [
+                {"matrix": [0, 0], "x": 0, "y": 0 }
+            ]
+        }
+    }
+}

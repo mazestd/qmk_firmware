@@ -1,0 +1,4 @@
+#should be blank
+
+RGBLIGHT_ENABLE = yes
+RGBLIGHT_DRIVER = WS2812

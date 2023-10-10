@@ -1,0 +1,9 @@
+// Copyright 2022 zzeneg (@zzeneg)
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#define RAW_USAGE_PAGE 0xFF60
+#define RAW_USAGE_ID 0x61
+
+#define DEBUG_MATRIX_SCAN_RATE
+
+#define SPLIT_TRANSACTION_IDS_USER RPC_ID_USER_HID_SYNC, RPC_ID_USER_CAPS_WORD_SYNC, RPC_ID_USER_LAYER_SYNC
