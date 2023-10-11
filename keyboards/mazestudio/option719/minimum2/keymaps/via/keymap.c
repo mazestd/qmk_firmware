@@ -7,8 +7,10 @@
 #include "process.h"
 #include "fonts/techfont.qff.h"
 
-static painter_font_handle_t font;
-static painter_device_t display;
+static painter_device_t display = NULL;
+static painter_font_handle_t font = NULL;
+
+void process_data(uint8_t *data, uint8_t length);
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -33,32 +35,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-void keyboard_post_init_kb(void) {
-    setPinOutput(GP2);
-    writePinHigh(GP2);
-    debug_enable = true;
-
-    font = qp_load_font_mem(font_techfont);
-    display = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
-    qp_set_viewport_offsets(display, 35, 0);
-    wait_ms(1000);
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    process_data(data, length);
 }
 
-/* Raw HID processing*/
-void raw_hid_receive(uint8_t *data, uint8_t length) {
-    //dprintf("raw_hid_receive - received %u bytes \n", length);
-    //printf("Received data %u:", data[1]);
-    //printf("%u:", data[2]);
-    //printf("%u \n", data[3]);
-    uint8_t data_type = data[0];
+uint32_t deffered_init(uint32_t trigger_time, void *cb_arg) {
+    setPinOutput(GP2);
+    writePinHigh(GP2);
 
-    if(data_type == 248) {
-        printf("Received clock: %s\n", (const char *)&data[1]);
-        if(qp_init(display, QP_ROTATION_0 == true)) {
-            qp_drawtext_recolor(display, 15, 10, font, (const char *)&data[1], 0, 0, 0, 0, 0, 255);
-            qp_flush(display);
-        } else {
-            printf("not initialized");            
-        }
+    display = qp_st7789_make_spi_device(LCD_WIDTH, LCD_HEIGHT, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
+    qp_init(display, QP_ROTATION_90);
+    qp_set_viewport_offsets(display, 0, 35);
+
+    font = qp_load_font_mem(font_techfont);
+    
+    qp_rect(display, 0, 0, 320, 170, 0, 0, 0, true);
+    qp_drawtext(display, 15, 85, font, "Alive");
+
+    return 0;
+}
+
+void keyboard_post_init_kb(void) {
+    debug_enable = true;
+    defer_exec(3000, deffered_init, NULL);
+}
+
+void process_data(uint8_t *data, uint8_t length) {
+    if (data[0] == 248) {
+       qp_drawtext(display, 15, 5, font, (const char *)&data[1]); 
     }
 }
