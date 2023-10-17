@@ -35,7 +35,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     )
 };
 
-void raw_hid_receive(uint8_t *data, uint8_t length) {
+void raw_hid_receive_kb(uint8_t *data, uint8_t length) {
     process_data(data, length);
 }
 
