@@ -1,7 +1,7 @@
 // Copyright 2023 Maze Studio
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#pragma
+#pragma once
 
 /* OLED Configuration */
 #define I2C_DRIVER I2CD1
