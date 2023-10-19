@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include QMK_KEYBOARD_H
+#include "raw_hid.h"
+
+static char buffer[15] = {0};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /*
@@ -25,3 +28,32 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LCTL, KC_LGUI, KC_LALT,                            KC_SPC,                             KC_RALT,          KC_RGUI, KC_RCTL,         KC_LEFT, KC_DOWN, KC_RGHT
     )
 };
+
+void raw_hid_receive(uint8_t *data, uint8_t length) {
+    if(data[0] == 248) {
+        memcpy(buffer, &data[1], 6);
+    }
+}
+
+
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+	return OLED_ROTATION_180;
+}
+/*
+static void render_status(void) {
+    //Host Keyboard LED Status
+    led_t led_state = host_keyboard_led_state();
+    oled_write_P(led_state.num_lock ? PSTR("NUM ") : PSTR("       "), false);
+    oled_write_P(led_state.caps_lock ? PSTR("CAPS ") : PSTR("       "), false);
+    oled_write_P(led_state.scroll_lock ? PSTR("SCRL") : PSTR("       "), false);
+}
+*/
+
+bool oled_task_user(void) {
+    //render_status();
+
+    oled_write(buffer, false);
+    printf("Print: %s", buffer);
+
+    return false;
+}
