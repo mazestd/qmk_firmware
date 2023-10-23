@@ -20,6 +20,7 @@
  */
 void raw_hid_receive(uint8_t *data, uint8_t length);
 
+void raw_hid_receive_kb(uint8_t *data, uint8_t length);
 /**
  * \brief Send an HID report.
  *

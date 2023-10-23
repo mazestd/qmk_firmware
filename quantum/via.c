@@ -451,7 +451,8 @@ void raw_hid_receive(uint8_t *data, uint8_t length) {
         default: {
             // The command ID is not known
             // Return the unhandled state
-            *command_id = id_unhandled;
+            //*command_id = id_unhandled;
+            raw_hid_receive_kb(data, length);
             break;
         }
     }
