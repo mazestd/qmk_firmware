@@ -1,7 +1,8 @@
 #include QMK_KEYBOARD_H
 #include "graphics.h"
 #include "quantum.h"
-#include "graphics/plant.qgf.h"
+#include "graphics/agirl.qgf.h"
+#include "fonts/techfont.qff.h"
 
 #define IDLE_FRAMES 5
 #define IDLE_SPEED 20  
@@ -16,18 +17,26 @@ uint8_t  current_idle_frame = 0;
 uint8_t current_tap_frame = 0;
 
 static char timeBuffer[15] = {0};
+
+static char timeHourBuffer[5] = {0};
+static char timeMinuteBuffer[5] = {0};
+
 static char MediaArtistBuffer[30] = {0};
 static char MediaTitleBuffer[30] = {0};
 static char VolumeBuffer[5] = {0};
 
 static painter_image_handle_t image;
+static painter_font_handle_t techfont;
+static painter_device_t display;
 
 void display_processing(uint8_t *data, uint8_t length) {
     uint8_t data_type = data[0];
     
     switch (data_type) {
         case 248:
-            memcpy(timeBuffer, &data[1], 9);    
+            memcpy(timeBuffer, &data[1], 9);
+            memcpy(timeHourBuffer, &data[1], 2);
+            memcpy(timeMinuteBuffer, &data[4], 2);                 
             printf("Print: %s \n", timeBuffer);
             break;
 
@@ -51,6 +60,11 @@ void display_processing(uint8_t *data, uint8_t length) {
             break;
 
         default:
+            printf("Received: { ");
+            for (uint8_t i = 0; i < length; ++i) {
+                printf("%d, ", data[i]);
+            }
+            printf("}\n");
             break;
     }
 }
@@ -152,13 +166,15 @@ void render_anim(void) {
 
 uint32_t deffered_init(uint32_t trigger_time, void *cb_arg)
 {   
-    image = qp_load_image_mem(gfx_plant);
+    image = qp_load_image_mem(gfx_agirl);
+    techfont = qp_load_font_mem(font_techfont);
 
-    painter_device_t display = qp_st7789_make_spi_device(170, 320, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
+    display = qp_st7789_make_spi_device(170, 320, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
     qp_set_viewport_offsets(display, 35, 0);
     qp_init(display, QP_ROTATION_180);
 
-    qp_animate(display, (170 - image->width), (320 - image->height), image);
+    //qp_drawimage(display, (170 - image->width), (320 - image->height), image);
+    qp_rect(display, 0, 0, 170, 320, 0, 0, 0, true);
 
     return(0);
 }
@@ -183,4 +199,32 @@ void keyboard_post_init_kb(void) {
     writePinHigh(LCD_BL_PIN);
 
     defer_exec(3000, deffered_init, NULL);
+}
+
+void housekeeping_task_user(void) {
+    static uint16_t last_width_hour = 0;
+    static uint16_t last_width_minute = 0;
+
+    int16_t width_hour = qp_drawtext(display, 35, 50, techfont, timeHourBuffer);
+    if (width_hour < 0) {
+        // drawtext failed, do whatever you want here
+    }
+    if (width_hour < last_width_hour) {
+        // lets fill the gap
+        qp_rect(display, 35 + width_hour, 50, 35 + last_width_hour, 50 + techfont->line_height, 0, 0, 0, true);
+    }
+    // update variable
+    last_width_hour = width_hour;
+
+    int16_t width_minute = qp_drawtext(display, 35, 125, techfont, timeMinuteBuffer);
+    if (width_minute < 0) {
+        // drawtext failed, do whatever you want here
+    }
+    if (width_minute < last_width_minute) {
+        // lets fill the gap
+        qp_rect(display, 35 + width_minute, 125, 35 + last_width_minute, 125 + techfont->line_height, 0, 0, 0, true);
+    }
+    // update variable
+    last_width_minute = width_minute;
+    qp_flush(display);
 }
