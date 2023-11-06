@@ -12,13 +12,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      * ├───┴─┬─┴─┬─┴─┬─┴─
      */
     [0] = LAYOUT(
-        KC_0, KC_0, KC_0, KC_0,
-        KC_0, KC_0, KC_0, KC_0,
-        KC_0, KC_0, KC_0, KC_0,
-        KC_0, KC_0, KC_0, KC_0
+        KC_0,    KC_0,    KC_0,    KC_0,
+        KC_0,    KC_0,    KC_0,    KC_0,
+        KC_0,    KC_UP,   KC_0,    KC_0,
+        KC_LEFT, KC_DOWN, KC_RGHT, KC_0
     )
 };
 
-void raw_hid_receive_kb(uint8_t *data, uint8_t length) {
+void raw_hid_receive(uint8_t *data, uint8_t length) {
     display_processing(data, length);
 }

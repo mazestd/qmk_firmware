@@ -13,7 +13,7 @@
         "oled": true
     },
     "matrix_pins": {
-        "cols": ["GP12", "GP13", "GP14", "GP15"],
+        "cols": ["GP15", "GP14", "GP13", "GP12"],
         "rows": ["GP19", "GP18", "GP17", "GP16"]
     },
     "diode_direction": "COL2ROW",

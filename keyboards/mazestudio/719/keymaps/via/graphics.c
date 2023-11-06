@@ -2,7 +2,10 @@
 #include "graphics.h"
 #include "quantum.h"
 #include "graphics/agirl.qgf.h"
+
 #include "fonts/techfont.qff.h"
+#include "fonts/typodraft.qff.h"
+
 
 #define IDLE_FRAMES 5
 #define IDLE_SPEED 20  
@@ -27,7 +30,11 @@ static char VolumeBuffer[5] = {0};
 
 static painter_image_handle_t image;
 static painter_font_handle_t techfont;
+static painter_font_handle_t typodraft;
 static painter_device_t display;
+
+const char* menus[] = {"Home", "Setting", "About"};
+uint8_t currentMenus = 0;
 
 void display_processing(uint8_t *data, uint8_t length) {
     uint8_t data_type = data[0];
@@ -48,6 +55,7 @@ void display_processing(uint8_t *data, uint8_t length) {
         case 251:
             memcpy(MediaArtistBuffer, &data[2], data[1]);
             printf("Title: %s \n", MediaArtistBuffer);
+            oled_clear();
             break;
         
         case 252:
@@ -164,10 +172,62 @@ void render_anim(void) {
     }
 }
 
+// define nowhere because i hate to get up again after this line
+static int16_t timer_hours = 1;
+static int16_t timer_minutes = 15;
+static uint32_t last_update = 0;
+
+void countdown_task(void) {
+    char timer_str[15] = {0};
+
+    uint32_t current_time = timer_elapsed(last_update);
+    if (current_time >= 1000) {
+        last_update += current_time;
+
+        if(timer_hours > 0 || timer_minutes > 0 ) {
+            snprintf(timer_str, sizeof(timer_str), "%02d:%02d", timer_hours, timer_minutes);
+            oled_write(timer_str, false);
+
+            if(timer_minutes == 0) {
+                timer_hours--;
+                timer_minutes = 59;
+            } else {
+                timer_minutes--;
+            }
+        }else{
+            oled_write(PSTR("00:00"), false);
+        }
+    }
+}
+
+bool oled_task_user(void) {
+    for (uint8_t i = 0; i < sizeof(menus) / sizeof(menus[0]); i++) {
+        if (i == currentMenus) {
+            oled_write("> ", false);
+        } else {
+            oled_write("  ", false);
+        }
+        oled_write_ln(menus[i], false);
+    }
+    /*
+    oled_write(timeBuffer, false);
+    oled_set_cursor(16, 0);
+    countdown_task();
+
+    oled_set_cursor(0, 1);
+    oled_write(MediaArtistBuffer, false);
+    oled_set_cursor(0, 2);
+    oled_write(MediaTitleBuffer, false);
+    */
+    return false;
+}
+
 uint32_t deffered_init(uint32_t trigger_time, void *cb_arg)
 {   
     image = qp_load_image_mem(gfx_agirl);
+
     techfont = qp_load_font_mem(font_techfont);
+    typodraft = qp_load_font_mem(font_typodraft);
 
     display = qp_st7789_make_spi_device(170, 320, LCD_CS_PIN, LCD_DC_PIN, LCD_RST_PIN, 0, 3);
     qp_set_viewport_offsets(display, 35, 0);
@@ -179,21 +239,6 @@ uint32_t deffered_init(uint32_t trigger_time, void *cb_arg)
     return(0);
 }
 
-bool oled_task_user(void) {
-    oled_write(timeBuffer, false);
-    oled_set_cursor(14, 0);
-    oled_write("VOL:", false);
-    oled_set_cursor(18, 0);
-    oled_write(VolumeBuffer, false);
-
-    oled_set_cursor(0, 1);
-    oled_write(MediaArtistBuffer, false);
-    oled_set_cursor(0, 2);
-    oled_write(MediaTitleBuffer, false);
-    
-    return false;
-}
-
 void keyboard_post_init_kb(void) {
     setPinOutput(LCD_BL_PIN);
     writePinHigh(LCD_BL_PIN);
@@ -202,9 +247,10 @@ void keyboard_post_init_kb(void) {
 }
 
 void housekeeping_task_user(void) {
+    /*
     static uint16_t last_width_hour = 0;
     static uint16_t last_width_minute = 0;
-
+    
     int16_t width_hour = qp_drawtext(display, 35, 50, techfont, timeHourBuffer);
     if (width_hour < 0) {
         // drawtext failed, do whatever you want here
@@ -226,5 +272,27 @@ void housekeeping_task_user(void) {
     }
     // update variable
     last_width_minute = width_minute;
+    */
+    char *samplewidth = "0";
+    int16_t width = qp_textwidth(typodraft, samplewidth);
+
+    qp_drawtext(display, (170/2 - width), 35, typodraft, timeHourBuffer);
+    qp_drawtext(display, (170/2 - width), 131, typodraft, timeMinuteBuffer);
+
+    qp_drawtext(display, 0, 308, techfont, VolumeBuffer);
     qp_flush(display);
+}
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode){
+        case KC_UP:
+            currentMenus++;
+            break;
+        case KC_DOWN:
+            if(currentMenus > 0) {
+                currentMenus--;
+            }
+            break;
+    }
+    return true;
 }
